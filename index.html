@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Shop</title>
+  <link rel="icon" type="image/png" href="assets/icon.png">
+  <!-- Fonts: Preconnect first, then font stylesheet -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Icons: Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Main CSS: style first, then advisor for overrides -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/advisor.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+  <link rel="stylesheet" href="css/phone.css">
+
+  <!-- Auth Script (Check Login) -->
+  <script src="js/auth.js"></script>
+
+  <!-- Chart.js (defer for performance) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+  <!-- jsPDF for Reporting (defer for performance) -->
+  <script src="js/lib/jspdf.umd.min.js" defer></script>
+  <script src="js/lib/jspdf.plugin.autotable.min.js" defer></script>
+  <!-- Bootstrap for Modals (defer for performance) -->
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- side bar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <i class="fas fa-shop"></i>
+        <span>My Shop</span>
+      </div>
+      <nav>
+        <ul class="nav-links">
+          <li class="nav-item">
+            <a href="#dashboard" class="nav-link active" data-page="dashboard">
+              <i class="fas fa-th-large"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#products" class="nav-link" data-page="products">
+              <i class="fas fa-box"></i>
+              <span>Products</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#pos" class="nav-link" data-page="pos">
+              <i class="fas fa-shopping-cart"></i>
+              <span>New Sale</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#expenditures" class="nav-link" data-page="expenditures">
+              <i class="fas fa-wallet"></i>
+              <span data-i18n="nav-expenditures">Expenditures</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#sales" class="nav-link" data-page="sales">
+              <i class="fas fa-file-invoice-dollar"></i>
+              <span>Sales History</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#customers" class="nav-link" data-page="customers">
+              <i class="fas fa-users"></i>
+              <span>Customers</span>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="#settings" class="nav-link" data-page="settings">
+              <i class="fas fa-cog"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+          <!-- Logout -->
+          <li class="nav-item"
+            style="margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <a href="#" class="nav-link" onclick="auth.logout()">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Logout</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <div class="sales-history-header app-header-compact">
+        <div class="header-main">
+          <div class="header-title">
+            <button class="menu-toggle" id="menu-toggle" title="Toggle Menu">
+              <i class="fas fa-bars"></i>
+            </button>
+            <i class="fas fa-th-large"></i>
+            <h2 id="page-title" data-i18n="dash-title">Dashboard</h2>
+          </div>
+          <div class="header-actions">
+            <button class="btn-refresh" id="btn-refresh-dashboard" title="Refresh Dashboard">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+            <span id="current-date"></span>
+          </div>
+        </div>
+      </div>
+      <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+      <!-- Dashboard Page -->
+      <section id="dashboard-page" class="page active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-info">
+              <h3 data-i18n="dash-today-sales">Today's Sales</h3>
+              <p id="stat-sales">$0.00</p>
+            </div>
+            <div class="stat-icon" style="background: rgba(40, 167, 69, 0.1); color: var(--success);">
+              <i class="fas fa-dollar-sign"></i>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <h3 data-i18n="dash-today-gross-profit">Gross Profit (Today)</h3>
+              <p id="stat-gross-profit">TSH 0</p>
+            </div>
+            <div class="stat-icon" style="background: rgba(255, 106, 0, 0.1); color: var(--primary);">
+              <i class="fas fa-chart-line"></i>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <h3 data-i18n="dash-today-net-profit">Net Profit (Today)</h3>
+              <p id="stat-net-profit">TSH 0</p>
+            </div>
+            <div class="stat-icon" style="background: rgba(40, 167, 69, 0.1); color: var(--success);">
+              <i class="fas fa-coins"></i>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <h3 data-i18n="dash-today-expenses">Today's Expenses</h3>
+              <p id="stat-expenses">TSH 0</p>
+            </div>
+            <div class="stat-icon" style="background: rgba(220, 53, 69, 0.1); color: var(--danger);">
+              <i class="fas fa-hand-holding-usd"></i>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <h3 data-i18n="dash-low-stock">Low Stock</h3>
+              <p id="stat-low-stock">0</p>
+            </div>
+            <div class="stat-icon" style="background: rgba(255, 193, 7, 0.1); color: var(--warning);">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <h3 data-i18n="dash-inventory-value">Inventory Value</h3>
+              <p id="stat-inventory-value">$0.00</p>
+            </div>
+            <div class="stat-icon" style="background: rgba(0, 123, 255, 0.1); color: var(--accent);">
+              <i class="fas fa-warehouse"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-sections">
+          <!-- Charts Row -->
+          <div class="charts-row">
+            <div class="chart-card card">
+              <h3 data-i18n="dash-sales-trend">Sales Trend (Last 7 Days)</h3>
+              <canvas id="sales-trend-chart"></canvas>
+            </div>
+            <div class="chart-card card">
+              <h3 data-i18n="dash-top-products">Top Products</h3>
+              <canvas id="top-products-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="recent-sales-card card">
+            <h3 data-i18n="dash-recent-transactions">Recent Transactions</h3>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th data-i18n="th-invoice">Invoice</th>
+                  <th data-i18n="th-customer">Customer</th>
+                  <th data-i18n="th-amount">Amount</th>
+                  <th data-i18n="th-date">Date</th>
+                </tr>
+              </thead>
+              <tbody id="recent-sales-list">
+                <!-- JS Populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Products Page (Alibaba Gallery Style) -->
+      <section id="products-page" class="page">
+        <div class="products-header">
+          <div class="products-toolbar">
+            <button class="btn btn-primary" id="btn-add-product">
+              <i class="fas fa-plus"></i> <span data-i18n="btn-add-product">Add Product</span>
+            </button>
+            <button class="btn btn-secondary" id="btn-export-products">
+              <i class="fas fa-file-pdf"></i> <span>Export PDF</span>
+            </button>
+            <div class="search-bar">
+              <i class="fas fa-search"></i>
+              <input type="text" id="product-search-input" data-i18n="ph-search-products"
+                placeholder="Search smartphones...">
+            </div>
+          </div>
+
+          <div class="products-filters">
+            <button class="filter-chip" id="filter-low-stock">
+              <i class="fas fa-exclamation-triangle"></i> <span data-i18n="dash-low-stock">Low Stock</span>
+            </button>
+            <div class="brand-filter">
+              <select id="filter-brand">
+                <option value="" data-i18n="ph-all-brands">All Brands</option>
+                <!-- JS Populated -->
+              </select>
+            </div>
+            <div class="brand-filter">
+              <select id="filter-sort">
+                <option value="name">Name (A-Z)</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="stock-high">Stock: High to Low</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="product-grid" id="product-list">
+          <!-- JS Populated -->
+        </div>
+      </section>
+
+      <!-- POS Page (Sales Interface) -->
+      <section id="pos-page" class="page">
+        <div class="pos-container">
+          <div class="pos-inventory">
+            <div class="products-header" style="margin-bottom: 1.5rem; padding: 1rem;">
+              <div class="products-toolbar">
+                <div class="search-bar" style="max-width: 100%;">
+                  <i class="fas fa-search"></i>
+                  <input type="text" id="pos-search-input" data-i18n="ph-search-sale"
+                    placeholder="Search products for sale...">
+                </div>
+              </div>
+            </div>
+            <!-- Product Grid -->
+            <div class="product-grid" id="pos-product-list">
+              <!-- JS Populated -->
+            </div>
+          </div>
+          <div class="pos-cart">
+            <h3 data-i18n="nav-pos">Cart</h3>
+            <!-- ... existing cart content ... -->
+            <!-- We need to close button for mobile cart sheet -->
+            <button class="btn-close-mobile-cart" onclick="POSController.toggleCart(false)"
+              style="position:absolute; top:1rem; right:1rem; background:none; border:none; font-size:1.5rem; display:none;">&times;</button>
+
+            <div class="cart-items" id="cart-list">
+              <!-- JS Populated -->
+            </div>
+            <div class="cart-summary">
+              <div class="customer-quick-add"
+                style="margin-bottom: 1rem; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                <h4 style="margin-bottom: 8px; font-size: 0.9rem;">Maelezo ya Mteja (Hiyari) (Customer Details
+                  (Optional))</h4>
+                <input type="text" id="pos-cust-name" placeholder="Jina (Name)"
+                  style="width: 100%; margin-bottom: 5px; padding: 6px; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" id="pos-cust-phone" placeholder="Namba ya Simu (Phone Number)"
+                  style="width: 100%; margin-bottom: 5px; padding: 6px; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" id="pos-cust-district" placeholder="Wilaya (District)"
+                  style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;">
+              </div>
+              <div class="summary-line">
+                <span>Jumla (Total)</span>
+                <span id="cart-total">$0.00</span>
+              </div>
+              <button class="btn btn-primary btn-block" id="btn-checkout">Kamilisha Mauzo (Complete Sale)</button>
+            </div>
+          </div>
+
+          <!-- Mobile Cart Toggle Button -->
+          <div class="pos-mobile-toggle" onclick="POSController.toggleCart(true)">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div
+                style="background:rgba(255,255,255,0.2); width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                <span id="mobile-cart-count" style="font-weight:bold; font-size:0.9rem;">0</span>
+              </div>
+              <span data-i18n="btn-view-cart">View Cart</span>
+            </div>
+            <span id="mobile-cart-total" style="font-weight:bold;">$0.00</span>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Sales History Page -->
+      <section id="sales-page" class="page">
+        <div class="sales-history-header">
+          <div class="header-main">
+            <div class="header-title">
+              <i class="fas fa-history"></i>
+              <h2 data-i18n="nav-sales">Sales History</h2>
+            </div>
+            <div class="header-actions">
+              <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="sales-search-input" data-i18n="ph-search-invoice"
+                  placeholder="Search invoice number...">
+              </div>
+              <button class="btn btn-secondary" id="btn-export-sales">
+                <i class="fas fa-file-pdf"></i> <span>Export PDF</span>
+              </button>
+            </div>
+          </div>
+          <div class="header-filters">
+            <input type="date" id="filter-start-date" class="form-control" title="Start Date">
+            <input type="date" id="filter-end-date" class="form-control" title="End Date">
+            <div class="brand-filter">
+              <select id="filter-payment-method" title="Payment Method">
+                <option value="">Malipo Yote (All Payments)</option>
+                <option value="cash">Pesa Taslimu (Cash)</option>
+                <option value="card">Kadi (Card)</option>
+                <option value="mobile_money">Pesa ya Mtandao (Mobile Money)</option>
+              </select>
+            </div>
+            <button class="filter-chip" id="btn-filter-today">Today</button>
+            <button class="filter-chip" id="btn-filter-week">This Week</button>
+            <button class="filter-chip" id="btn-filter-month">This Month</button>
+            <button class="filter-chip" id="btn-filter-year">This Year</button>
+            <button class="filter-chip active" id="btn-filter-sales">
+              <i class="fas fa-filter"></i> Tumia (Apply)
+            </button>
+            <button class="filter-chip" id="btn-reset-filters">
+              <i class="fas fa-redo"></i> Anza Upya (Reset)
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="sales-summary">
+            <div class="summary-card">
+              <div class="summary-icon" style="background: rgba(40, 167, 69, 0.1); color: var(--success);">
+                <i class="fas fa-dollar-sign"></i>
+              </div>
+              <div>
+                <small>Jumla ya Mauzo (Total Sales)</small>
+                <h3 id="summary-total-sales">$0.00</h3>
+              </div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-icon" style="background: rgba(0, 123, 255, 0.1); color: var(--accent);">
+                <i class="fas fa-receipt"></i>
+              </div>
+              <div>
+                <small>Miamala (Transactions)</small>
+                <h3 id="summary-transaction-count">0</h3>
+              </div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-icon" style="background: rgba(255, 106, 0, 0.1); color: var(--primary);">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div>
+                <small>Wastani wa Mauzo (Average Sale)</small>
+                <h3 id="summary-avg-sale">$0.00</h3>
+              </div>
+            </div>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th data-i18n="th-invoice">Invoice</th>
+                <th data-i18n="th-customer">Customer</th>
+                <th data-i18n="th-amount">Amount</th>
+                <th data-i18n="th-payment">Payment</th>
+                <th data-i18n="th-date">Date</th>
+                <th data-i18n="th-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="sales-history-list">
+              <!-- JS Populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Sale Invoice Preview Modal -->
+      <div class="modal" id="sale-preview-modal">
+        <div class="modal-content">
+          <button class="btn-close" id="sale-preview-close" title="Close">×</button>
+          <button class="btn btn-primary" id="sale-preview-print"
+            style="position:absolute;top:12px;left:12px;z-index:2;">
+            <i class="fas fa-print"></i> Print / PDF
+          </button>
+          <div class="invoice-preview">
+            <div class="invoice-header">
+              <div>
+                <h3>Invoice <span id="preview-invoice-number"></span></h3>
+                <small id="preview-date"></small>
+              </div>
+              <div class="invoice-customer">
+                <p><strong>Customer:</strong> <span id="preview-customer-name"></span></p>
+                <p><strong>Phone:</strong> <span id="preview-phone"></span></p>
+                <p><strong>Invoice No:</strong> <span id="preview-invoice-no"></span></p>
+              </div>
+            </div>
+
+            <div class="invoice-meta">
+              <p><strong>Amount Paid:</strong> <span id="preview-amount-paid"></span></p>
+              <p><strong>Payment Method:</strong> <span id="preview-payment-method"></span></p>
+            </div>
+
+            <div class="invoice-details">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody id="preview-items-list"></tbody>
+              </table>
+            </div>
+
+            <div class="invoice-notes" style="margin:1rem 0 0.5rem 0;">
+              <strong>Notes:</strong> <span id="preview-notes"></span>
+            </div>
+            <div class="invoice-footer">
+              <p><strong>Subtotal:</strong> <span id="preview-subtotal"></span></p>
+              <p><strong>Tax:</strong> <span id="preview-tax"></span></p>
+              <p><strong>Total:</strong> <span id="preview-total-amount"></span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expenditures Page -->
+      <section id="expenditures-page" class="page">
+        <div class="products-header">
+          <div class="products-toolbar">
+            <button class="btn btn-primary" id="btn-add-expenditure">
+              <i class="fas fa-plus"></i> <span data-i18n="btn-add-expenditure">Add Expenditure</span>
+            </button>
+            <div class="search-bar">
+              <i class="fas fa-search"></i>
+              <input type="text" id="expenditure-search-input" data-i18n="ph-search-expenditures"
+                placeholder="Search expenditures...">
+            </div>
+            <button class="btn btn-secondary" id="btn-export-expenditures">
+              <i class="fas fa-file-pdf"></i> <span>Export PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th data-i18n="th-date">Date</th>
+                <th data-i18n="th-type">Type</th>
+                <th data-i18n="th-description">Description</th>
+                <th data-i18n="th-amount">Amount</th>
+                <th data-i18n="th-payment">Payment</th>
+                <th data-i18n="th-recipient">Recipient</th>
+                <th data-i18n="th-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="expenditures-list">
+              <!-- JS Populated -->
+            </tbody>
+          </table>
+        </div>
+
+
+        <!-- Daily Expenditure Summary JS Populated -->
+        <div id="daily-expenditure-summary"></div>
+      </section>
+
+      <!-- Customers Page -->
+      <section id="customers-page" class="page">
+        <div class="products-header">
+          <div class="products-toolbar">
+            <button class="btn btn-primary" id="btn-add-customer">
+              <i class="fas fa-plus"></i> <span data-i18n="btn-add-customer">Add Customer</span>
+            </button>
+            <div class="search-bar">
+              <i class="fas fa-search"></i>
+              <input type="text" id="customer-search-input" data-i18n="ph-search-customers"
+                placeholder="Search customers...">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th data-i18n="th-name">Name</th>
+                <th data-i18n="th-phone">Phone</th>
+                <th data-i18n="th-email">Email</th>
+                <th data-i18n="th-address">Address</th>
+                <th data-i18n="th-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="customers-list">
+              <!-- JS Populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+
+      <!-- Settings Page -->
+
+      <section id="settings-page" class="page">
+        <div class="settings-container">
+          <!-- Categories Section -->
+          <div class="settings-section card">
+            <h3 data-i18n="settings-categories">Makundi ya Bidhaa (Product Categories)</h3>
+            <div class="category-list">
+              <div class="category-item">
+                <i class="fas fa-mobile-alt"></i>
+                <span>Smartphone</span>
+                <span class="badge">Default</span>
+              </div>
+              <div class="category-item">
+                <i class="fas fa-tablet-alt"></i>
+                <span>Tablet</span>
+                <span class="badge">Default</span>
+              </div>
+              <div class="category-item">
+                <i class="fas fa-headphones"></i>
+                <span>Accessory</span>
+                <span class="badge">Default</span>
+              </div>
+              <div class="category-item">
+                <i class="fas fa-box"></i>
+                <span>Other</span>
+                <span class="badge">Default</span>
+              </div>
+            </div>
+            <p class="help-text mt-2 small text-muted"><i class="fas fa-info-circle"></i> Vitengo hivi hutumika kupanga
+              mzigo wako.</p>
+          </div>
+
+          <!-- Appearance & Language -->
+          <div class="settings-section card">
+            <h3 data-i18n="settings-appearance">Appearance & Language</h3>
+            <div class="form-group">
+              <label data-i18n="settings-language">Language</label>
+              <select id="select-language">
+                <option value="en" data-i18n="lang-en">English</option>
+                <option value="sw" data-i18n="lang-sw">Swahili</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label data-i18n="settings-theme">Theme</label>
+              <select id="select-theme">
+                <option value="light" data-i18n="theme-light">Light</option>
+                <option value="dark" data-i18n="theme-dark">Dark</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Connectivity -->
+          <div class="settings-section card">
+            <h3 data-i18n="settings-connectivity">System Connectivity</h3>
+            <div class="connection-status-box">
+              <div class="connection-info">
+                <div class="status-indicator">
+                  <span class="status-dot" id="connection-dot"></span>
+                  <span id="connection-text">Checking status...</span>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" id="btn-check-connection">
+                <i class="fas fa-network-wired"></i> Angalia Sasa (Check Now)
+              </button>
+            </div>
+          </div>
+
+          <!-- About App -->
+          <div class="settings-section card">
+            <h3>About My Shop</h3>
+            <div class="app-info" style="text-align: center; padding: 1rem 0;">
+              <div class="logo-circle" style="
+                  width: 44px; 
+                  height: 44px; 
+                  background: var(--primary); 
+                  border-radius: 50%; 
+                  display: flex; 
+                  align-items: center; 
+                  justify-content: center; 
+                  margin: 0 auto 1rem;
+                  color: white;
+                  font-size: 1.5rem;
+                ">
+                <i class="fas fa-shop"></i>
+              </div>
+              <h4 style="margin: 0;">My Shop</h4>
+              <p class="text-muted small">Smartphone Management System</p>
+              <p class="badge badge-primary" style="margin-top: 0.5rem; display: inline-block;">Version 1.0.0</p>
+              <p class="text-muted small" style="margin-top: 1rem;">
+                &copy; 2026 My Shop. All rights reserved.
+              </p>
+            </div>
+          </div>
+
+          <!-- Developer Info -->
+          <div class="settings-section card">
+            <h3>About Developer</h3>
+            <div class="developer-profile">
+              <div class="dev-info">
+                <h4>Abdul Mujib</h4>
+                <p class="text-muted small">Web & App Developer</p>
+                <p class="text-muted small"><i class="fas fa-map-marker-alt"></i> Geita, Tanzania</p>
+              </div>
+              <a href="https://codexing0162.github.io/mujeeb-portfolio/" target="_blank"
+                class="btn btn-secondary btn-sm">
+                View Portfolio <i class="fas fa-external-link-alt"></i>
+              </a>
+            </div>
+          </div>
+
+
+
+
+
+    </main>
+  </div>
+
+  <!-- Modals (Add Product, etc.) -->
+  <div id="modal-product" class="modal">
+    <div class="modal-content">
+      <h3 id="modal-product-title" data-i18n="btn-add-product">Add New Smartphone</h3>
+      <form id="form-product">
+        <input type="hidden" name="product_id" id="product-id-field">
+        <div class="form-row-3">
+          <div class="form-group">
+            <label data-i18n="th-brand">Brand</label>
+            <input type="text" name="brand" required data-i18n="ph-brand-eg" placeholder="e.g. Apple">
+          </div>
+          <div class="form-group">
+            <label data-i18n="th-model">Model</label>
+            <input type="text" name="model" required data-i18n="ph-model-eg" placeholder="e.g. iPhone 15 Pro">
+          </div>
+          <div class="form-group">
+            <label data-i18n="th-type">Category</label>
+            <select name="category">
+              <option value="smartphone">Smartphone</option>
+              <option value="tablet">Tablet</option>
+              <option value="accessory">Accessory</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-3">
+          <div class="form-group">
+            <label data-i18n="th-cost">Cost Price</label>
+            <input type="number" name="cost_price" step="0.01" required>
+          </div>
+          <div class="form-group">
+            <label data-i18n="th-selling">Selling Price</label>
+            <input type="number" name="selling_price" step="0.01" required>
+          </div>
+          <div class="form-group">
+            <label data-i18n="th-quantity">Quantity</label>
+            <input type="number" name="quantity" value="0">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label data-i18n="th-min-stock">Min Stock Alert</label>
+            <input type="number" name="min_stock_alert" value="5" min="0">
+          </div>
+          <div class="form-group">
+            <label>IMEI <small>(Optional)</small></label>
+            <input type="text" name="imei" data-i18n="ph-imei" placeholder="Unique device identifier">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label data-i18n="th-description">Description <small>(Optional)</small></label>
+            <textarea name="description" rows="5" data-i18n="ph-desc-eg" placeholder="Product details..."></textarea>
+          </div>
+          <div class="form-group">
+            <label data-i18n="th-image">Product Image</label>
+            <div class="image-upload-tabs">
+              <div class="tab-buttons">
+                <button type="button" class="tab-btn active" data-tab="upload" data-i18n="btn-upload">Upload</button>
+                <button type="button" class="tab-btn" data-tab="url" data-i18n="btn-url">URL</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-pane active" id="tab-upload">
+                  <input type="file" name="image" id="image-file-input" accept="image/*">
+                  <small data-i18n="msg-file-limit" style="display:block; margin-top:5px;">Max: 5MB (JPG, PNG)</small>
+                </div>
+                <div class="tab-pane" id="tab-url">
+                  <input type="url" name="image_url" id="image-url-input" data-i18n="ph-url"
+                    placeholder="Paste image link">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn" id="btn-close-modal" data-i18n="btn-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" data-i18n="btn-save">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Preview Modal -->
+  <div id="modal-preview" class="modal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h3 id="preview-title" data-i18n="btn-preview">Product Preview</h3>
+        <button type="button" class="btn-close" id="btn-close-preview">&times;</button>
+      </div>
+      <div class="preview-container">
+        <div class="preview-image">
+          <img id="preview-img" src="" alt="Product">
+        </div>
+        <div class="preview-details">
+          <span class="preview-brand" id="preview-brand"></span>
+          <h2 id="preview-model"></h2>
+          <div class="preview-price" id="preview-price"></div>
+          <div class="preview-info-grid">
+            <div class="info-item">
+              <i class="fas fa-warehouse"></i>
+              <div>
+                <small data-i18n="dash-low-stock">Stock</small>
+                <strong id="preview-stock"></strong>
+              </div>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-dollar-sign"></i>
+              <div>
+                <small data-i18n="th-cost">Cost Price</small>
+                <strong id="preview-cost"></strong>
+              </div>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-chart-line"></i>
+              <div>
+                <small data-i18n="dash-today-profit">Profit Margin</small>
+                <strong id="preview-margin"></strong>
+              </div>
+            </div>
+          </div>
+          <div class="preview-actions">
+            <button class="btn btn-primary" onclick="editProductFromPreview()">
+              <i class="fas fa-edit"></i> <span data-i18n="btn-edit">Edit Product</span>
+            </button>
+            <button class="btn btn-secondary" onclick="addToCartFromPreview()">
+              <i class="fas fa-shopping-cart"></i> <span data-i18n="btn-add-cart">Add to Cart</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Expenditure Modal -->
+  <div id="modal-expenditure" class="modal">
+    <div class="modal-content">
+      <h3 id="modal-expenditure-title" data-i18n="btn-add-expenditure">Add New Expenditure</h3>
+      <form id="form-expenditure">
+        <input type="hidden" name="id" id="expenditure-id-field">
+        <div class="form-row-3">
+          <div class="form-group">
+            <label data-i18n="th-date">Date</label>
+            <input type="date" name="expense_date" id="expenditure-date" required>
+          </div>
+          <div class="form-group">
+            <label data-i18n="th-type">Type</label>
+            <select name="category" id="expenditure-category" required>
+              <option value="Rent" data-i18n="cat-rent">Rent</option>
+              <option value="Electricity" data-i18n="cat-elec">Electricity</option>
+              <option value="Water" data-i18n="cat-wate">Water</option>
+              <option value="Salary" data-i18n="cat-sala">Salary</option>
+              <option value="Internet" data-i18n="cat-inte">Internet</option>
+              <option value="Transport" data-i18n="cat-tran">Transport</option>
+              <option value="Maintenance" data-i18n="cat-main">Maintenance</option>
+              <option value="Taxes" data-i18n="cat-taxe">Taxes</option>
+              <option value="Other" data-i18n="cat-othe">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-i18n="th-amount">Amount</label>
+            <input type="number" name="amount" step="0.01" required placeholder="0.00">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label data-i18n="th-payment">Payment Method</label>
+            <select name="payment" required>
+              <option value="Cash" data-i18n="pay-cash">Cash</option>
+              <option value="M-Pesa">M-Pesa</option>
+              <option value="Tigo Pesa">Tigo Pesa</option>
+              <option value="Airtel Money">Airtel Money</option>
+              <option value="Bank Transfer" data-i18n="pay-bank">Bank Transfer</option>
+              <option value="Cheque" data-i18n="pay-cheque">Cheque</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-i18n="th-recipient">Recipient</label>
+            <input type="text" name="recipient" data-i18n="ph-recipient-eg" placeholder="Person or Company name">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label data-i18n="th-description">Description</label>
+          <textarea name="description" rows="2" data-i18n="ph-desc-eg"
+            placeholder="Details about the expense..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn" id="btn-close-expenditure" data-i18n="btn-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" data-i18n="btn-save">Save Expenditure</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Customer Modal -->
+  <div id="modal-customer" class="modal">
+    <div class="modal-content">
+      <h3 data-i18n="btn-add-customer">Add New Customer</h3>
+      <form id="form-customer">
+        <div class="form-row">
+          <div class="form-group">
+            <label data-i18n="th-name">Full Name</label>
+            <input type="text" name="name" required data-i18n="ph-name-eg" placeholder="e.g. John Doe">
+          </div>
+          <div class="form-group">
+            <label data-i18n="th-phone">Phone Number</label>
+            <input type="tel" name="phone" data-i18n="ph-phone-eg" placeholder="e.g. +255...">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label data-i18n="th-email">Email Address</label>
+            <input type="email" name="email" data-i18n="ph-email-eg" placeholder="e.g. john@example.com">
+          </div>
+          <div class="form-group">
+            <label data-i18n="th-address">Address</label>
+            <textarea name="address" rows="2" data-i18n="ph-addr-eg" placeholder="Street address..."></textarea>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn" id="btn-close-customer" data-i18n="btn-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" data-i18n="btn-save">Save Customer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Emergency Plan Modal -->
+  <div class="modal fade" id="emergency-modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Mpango wa Dharura</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="emergency-plan-content">
+          <!-- Emergency plan will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Simulation Modal -->
+  <div class="modal fade" id="simulation-modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Matokeo ya Simulation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="simulation-modal-body">
+          <!-- Simulation results will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/utils/ui.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/notification.js"></script>
+
+  <!-- Controllers -->
+  <script src="js/controllers/dashboard.js"></script>
+  <script src="js/controllers/products.js"></script>
+  <script src="js/controllers/pos.js"></script>
+
+  <!-- Legacy Modules (to be refactored) -->
+  <script src="js/sales-history.js"></script>
+  <script src="js/customers.js"></script>
+  <script src="js/advisor-ui.js"></script>
+  <script src="js/expenditures.js"></script>
+  <script src="js/settings.js"></script>
+
+  <script src="js/app.js"></script>
+  <!-- Global FAB -->
+  <button id="fab-sale" class="fab-sale" title="New Sale">
+    <i class="fas fa-shopping-cart"></i>
+  </button>
+
+  <!-- Bottom Navigation (Mobile) -->
+  <nav class="bottom-nav">
+    <a href="#" class="nav-item-mobile active" data-page="dashboard" onclick="switchPage('dashboard'); return false;">
+      <i class="fas fa-th-large"></i>
+      <span>Home</span>
+    </a>
+    <a href="#" class="nav-item-mobile" data-page="products" onclick="switchPage('products'); return false;">
+      <i class="fas fa-box"></i>
+      <span>Stock</span>
+    </a>
+    <a href="#" class="nav-item-mobile fab-center" data-page="pos" onclick="switchPage('pos'); return false;">
+      <div class="fab-circle">
+        <i class="fas fa-plus"></i>
+      </div>
+    </a>
+    <a href="#" class="nav-item-mobile" data-page="sales" onclick="switchPage('sales'); return false;">
+      <i class="fas fa-history"></i>
+      <span>History</span>
+    </a>
+    <a href="#" class="nav-item-mobile" onclick="UI.toggleSidebar(); return false;">
+      <i class="fas fa-bars"></i>
+      <span>Menu</span>
+    </a>
+  </nav>
+
+</body>
+
+</html>

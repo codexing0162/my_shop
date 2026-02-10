@@ -1,0 +1,312 @@
+/* Mobile Responsive Styles (Phone & Tablet) */
+
+.pos-mobile-toggle {
+    display: none;
+}
+
+/* Default: Desktop styles apply. We override for screens narrower than 992px (Tablet) and 768px (Phone) */
+
+/* =========================================
+   Tablet & Mobile Common Overrides
+   ========================================= */
+@media screen and (max-width: 992px) {
+    .sidebar {
+        transform: translateX(-100%);
+        box-shadow: none;
+        z-index: 1000;
+        width: 280px;
+        background: var(--bg-card);
+        /* Ensure solid background for drawer */
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding-bottom: 80px;
+        /* Space for Bottom Nav */
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* =========================================
+   Phone Specific Overrides (max-width: 768px)
+   ========================================= */
+@media screen and (max-width: 768px) {
+
+    /* 1. Layout Adjustments */
+    .app-container {
+        flex-direction: column;
+    }
+
+    .main-content {
+        padding: 1rem;
+        padding-bottom: 90px;
+        /* Extra space for bottom nav */
+    }
+
+    /* 2. Header Improvements */
+    .sales-history-header,
+    .app-header-compact {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-radius: var(--radius-md);
+    }
+
+    .header-main {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .header-title h2 {
+        font-size: 1.5rem;
+    }
+
+    /* 3. Grid & Cards */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        /* Single column for stats on phone */
+        gap: 1rem;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        /* Two columns for products */
+        gap: 0.75rem;
+    }
+
+    .product-card .product-image {
+        height: 150px;
+    }
+
+    .product-info {
+        padding: 0.75rem;
+    }
+
+    .product-model {
+        font-size: 0.95rem;
+    }
+
+    .product-price {
+        font-size: 1rem;
+    }
+
+    /* 4. POS Layout */
+    .pos-container {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+    }
+
+    .pos-inventory {
+        margin-bottom: 1rem;
+    }
+
+    .pos-cart {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 85vh;
+        /* Slide up sheet when active, handled via JS classes usually, or simple scroll for now */
+        z-index: 2000;
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1);
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .pos-cart.open {
+        transform: translateY(0);
+    }
+
+    .pos-cart.open .btn-close-mobile-cart {
+        display: block !important;
+    }
+
+    /* POS Cart Mobile Toggle (New Element to be added in HTML) */
+    .pos-mobile-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--primary);
+        color: white;
+        padding: 1rem;
+        border-radius: 50px;
+        position: fixed;
+        bottom: 80px;
+        right: 1rem;
+        left: 1rem;
+        z-index: 990;
+        box-shadow: 0 4px 15px rgba(255, 106, 0, 0.3);
+    }
+
+    /* 5. Tables */
+    .data-table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 0.75rem;
+    }
+
+    /* 6. Typography */
+    body {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+    }
+}
+
+/* =========================================
+   Bottom Navigation Bar
+   ========================================= */
+.bottom-nav {
+    display: none;
+    /* Hidden on desktop */
+}
+
+@media screen and (max-width: 992px) {
+    .bottom-nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        z-index: 1050;
+        padding-bottom: env(safe-area-inset-bottom);
+        box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.03);
+    }
+
+    .dark-theme .bottom-nav {
+        background: rgba(26, 28, 44, 0.95);
+        border-top-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-item-mobile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        height: 100%;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.7rem;
+        font-weight: 500;
+        gap: 4px;
+        transition: all 0.2s ease;
+    }
+
+    .nav-item-mobile i {
+        font-size: 1.4rem;
+        margin-bottom: 2px;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .nav-item-mobile.active {
+        color: var(--primary);
+    }
+
+    .nav-item-mobile.active i {
+        transform: translateY(-2px);
+    }
+
+    /* Center FAB effect for POS/Action */
+    .nav-item-mobile.fab-center {
+        position: relative;
+        top: -20px;
+    }
+
+    .nav-item-mobile.fab-center .fab-circle {
+        background: var(--primary);
+        color: white;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 20px rgba(255, 106, 0, 0.4);
+        font-size: 1.5rem;
+        transition: transform 0.2s;
+    }
+
+    .nav-item-mobile.fab-center.active .fab-circle {
+        background: var(--primary-hover);
+        transform: scale(1.05);
+    }
+}
+
+/* =========================================
+   Drawer Enhancements (Mobile Sidebar)
+   ========================================= */
+@media screen and (max-width: 992px) {
+    .sidebar .logo {
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    .nav-links {
+        padding: 0 1rem;
+    }
+
+    /* Hide items that are in bottom nav from sidebar to avoid redundancy, 
+       OR keep them as a full menu. Let's keep them for completeness but maybe style differently. */
+}
+
+/* =========================================
+   Utility Enhancements for Touch
+   ========================================= */
+@media (hover: none) and (pointer: coarse) {
+
+    /* Increase touch targets */
+    .btn,
+    .nav-link,
+    select,
+    input,
+    .filter-chip {
+        min-height: 44px;
+    }
+
+    /* Better scrolling */
+    .product-grid,
+    .cart-items,
+    .data-table {
+        -webkit-overflow-scrolling: touch;
+    }
+}
